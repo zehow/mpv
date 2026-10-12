@@ -185,6 +185,9 @@ static void vf_format_process(struct mp_filter *f)
                 .mdm = get_side_data(img, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA),
                 .clm = get_side_data(img, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL),
                 .dhp = get_side_data(img, AV_FRAME_DATA_DYNAMIC_HDR_PLUS),
+#ifdef PL_HAVE_LAV_HDR_VIVID
+                .dhv = get_side_data(img, AV_FRAME_DATA_DYNAMIC_HDR_VIVID),
+#endif
             });
             // Tell the f_enhancement_pair filter to not inherit DV metadata
             // from the EL.

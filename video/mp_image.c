@@ -1174,10 +1174,16 @@ struct mp_image *mp_image_from_av_frame(struct AVFrame *src)
     AVFrameSideData *mdm = av_frame_get_side_data(src, AV_FRAME_DATA_MASTERING_DISPLAY_METADATA);
     AVFrameSideData *clm = av_frame_get_side_data(src, AV_FRAME_DATA_CONTENT_LIGHT_LEVEL);
     AVFrameSideData *dhp = av_frame_get_side_data(src, AV_FRAME_DATA_DYNAMIC_HDR_PLUS);
+#ifdef PL_HAVE_LAV_HDR_VIVID
+    AVFrameSideData *dhv = av_frame_get_side_data(src, AV_FRAME_DATA_DYNAMIC_HDR_VIVID);
+#endif
     pl_map_hdr_metadata(&dst->params.color.hdr, &(struct pl_av_hdr_metadata) {
         .mdm = (void *)(mdm ? mdm->data : NULL),
         .clm = (void *)(clm ? clm->data : NULL),
         .dhp = (void *)(dhp ? dhp->data : NULL),
+#ifdef PL_HAVE_LAV_HDR_VIVID
+        .dhv = (void *)(dhv ? dhv->data : NULL),
+#endif
     });
 
     sd = av_frame_get_side_data(src, AV_FRAME_DATA_A53_CC);
