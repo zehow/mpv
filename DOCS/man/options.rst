@@ -7680,7 +7680,8 @@ them.
 
     auto
         Maps to ``bt.2390`` when using ``--vo=gpu``, and to ``spline`` with
-        ``--vo=gpu-next``. (Default)
+        ``--vo=gpu-next``. When playing content with HDR Vivid dynamic metadata,
+        automatically selects ``hdrvivid`` instead. (Default)
     clip
         Hard-clip any out-of-range values. Use this when you care about
         perfect color accuracy for in-range values at the cost of completely
@@ -7726,6 +7727,10 @@ them.
         Dynamic tone-mapping method specified in SMPTE ST2094-10 Annex B.2.
         Conceptually simpler than ST2094-40, and generally produces worse
         results.
+    hdrvivid
+        Dynamic tone-mapping method specified in CUVA 005.1 (T-UWA 005.1),
+        driven by HDR Vivid dynamic metadata. In the absence of metadata, falls
+        back to a fixed spline curve. (``--vo=gpu-next`` only)
 
 ``--tone-mapping-param=<value>``
     Set tone mapping parameters. By default, this is set to the special string

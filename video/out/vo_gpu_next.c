@@ -156,6 +156,10 @@ struct priv {
     bool paused;
 
     pl_options pars;
+    // Scratch copy of color_map_params used to override the tone mapping
+    // function for HDR Vivid content. Must persist across pl_render_image,
+    // so it lives in priv instead of on draw_frame()'s stack.
+    struct pl_color_map_params vivid_cmap;
     struct m_config_cache *opts_cache;
     struct m_config_cache *next_opts_cache;
     struct gl_next_opts *next_opts;
@@ -1353,6 +1357,17 @@ static bool draw_frame(struct vo *vo, struct vo_frame *frame)
     bool can_interpolate = opts->interpolation && frame->display_synced &&
                            !frame->still && frame->num_frames > 1 && !p->paused;
     double pts_offset = can_interpolate ? frame->ideal_frame_vsync : 0;
+    if (frame->current && opts->tone_map.curve == TONE_MAPPING_AUTO &&
+        pl_hdr_metadata_contains(&frame->current->params.color.hdr,
+                                 PL_HDR_METADATA_HDRVIVID))
+    {
+        // Prefer the HDR Vivid curve when the source carries HDR Vivid
+        // metadata and the user did not explicitly select a curve.
+        p->vivid_cmap = *params.color_map_params;
+        p->vivid_cmap.tone_mapping_function = &pl_tone_map_hdr_vivid;
+        params.color_map_params = &p->vivid_cmap;
+        MP_VERBOSE(vo, "Auto-selecting 'hdrvivid' tone mapping for HDR Vivid content\n");
+    }
     params.info_callback = info_callback;
     params.info_priv = vo;
     params.skip_caching_single_frame = !cache_frame;
